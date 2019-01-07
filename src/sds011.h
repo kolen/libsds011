@@ -1,3 +1,10 @@
+#ifndef __SIMBA_H__
+  #include <stdint.h>
+  #include <stddef.h>
+  // POSIX only
+  #include <unistd.h>
+#endif
+
 #define SDS011_DATA_REPORTING_ACTIVE 0
 #define SDS011_DATA_REPORTING_QUERY 1
 
@@ -9,9 +16,14 @@
 
 typedef uint16_t sds011_device_id_t;
 
+typedef ssize_t (*sds011_serial_read_fn_t)(void *rx_device, void *buf, size_t size);
+typedef ssize_t (*sds011_serial_write_fn_t)(void *tx_device, const void *buf, size_t size);
+
 struct sds011_device_t {
-  struct queue_t *chin;
-  struct chan_t *chout;
+  sds011_serial_read_fn_t read_fn;
+  sds011_serial_write_fn_t write_fn;
+  void *rx_device;
+  void *tx_device;
   uint16_t device_id;
 };
 
@@ -42,8 +54,10 @@ struct sds011_reply_t {
   sds011_device_id_t device_id;
 };
 
+#ifdef __SIMBA_H__
 void sds011_init_with_uart(struct sds011_device_t *device, struct uart_driver_t *uart);
 void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft_driver_t *uart);
+#endif
 
 void sd011_set_query_device_id(struct sds011_device_t *device, sds011_device_id_t device_id);
 

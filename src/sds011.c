@@ -1,7 +1,12 @@
 // See 'Laser Dust Sensor Control Protocol V1.3 Nova Fitness Co.,Ltd.'
 
 #include <stddef.h>
-#include "simba.h"
+#ifdef SIMBA_OS
+  #include "simba.h"
+  #define ERROR_BAD_REPLY EPROTO
+#else
+  #define ERROR_BAD_REPLY -1
+#endif
 #include "sds011.h"
 
 #define SDS011_COMMAND_HEAD 0xaa
@@ -14,9 +19,12 @@
 #define SDS011_COMMAND_INCOMING_MEASUREMENT 0xc0
 
 struct sds011_raw_command_reply_t {
-  char command;
-  char data[6];
+  unsigned char command;
+  unsigned char data[6];
 };
+
+#define device_read(device, buffer, size) (device->read_fn(device->tx_device, buffer, size))
+#define device_write(device, buffer, size) (device->write_fn(device->tx_device, buffer, size))
 
 int sds011_send_command(struct sds011_device_t *device, char command, const char *data, size_t data_length)
 {
@@ -36,21 +44,21 @@ int sds011_send_command(struct sds011_device_t *device, char command, const char
     command_buf[buf_i] = 0;
     buf_i++;
   }
-  command_buf[15] = device->device_id && 0xff;
-  command_buf[16] = device->device_id && 0xff00 >> 8;
+  command_buf[15] = device->device_id & 0xff;
+  command_buf[16] = device->device_id & 0xff00 >> 8;
   command_buf[17] = checksum;
   command_buf[18] = SDS011_COMMAND_TAIL;
-  return chan_write(device->chout, command_buf, sizeof(command_buf));
+  return device_write(device, command_buf, sizeof(command_buf));
 }
 
 // data is 6 bytes
 int sds011_read_raw(struct sds011_device_t *device, struct sds011_raw_command_reply_t *reply)
 {
-  char command_buffer[9];
+  unsigned char command_buffer[9];
   do {
-    queue_read(device->chin, command_buffer, 1);
+    device_read(device, command_buffer, 1);
   } while (command_buffer[0] != SDS011_COMMAND_HEAD);
-  queue_read(device->chin, command_buffer, 9);
+  device_read(device, command_buffer, 9);
 
   char checksum = 0;
   int i;
@@ -62,9 +70,9 @@ int sds011_read_raw(struct sds011_device_t *device, struct sds011_raw_command_re
   if (checksum == command_buffer[7] && command_buffer[8] == SDS011_COMMAND_TAIL) {
     //memcpy(&command_buffer[1], &(reply->data), 6);
     reply->command = command_buffer[0];
-    return TRUE;
+    return 1;
   } else {
-    return FALSE;
+    return 0;
   }
 }
 
@@ -103,10 +111,10 @@ int sds011_read_reply(struct sds011_device_t *device, struct sds011_reply_t *rep
       reply->firmware_version[2] = raw_reply.data[3];
       break;
     default:
-      return -EPROTO;
+      return -ERROR_BAD_REPLY;
     }
   default:
-    return -EPROTO;
+    return -ERROR_BAD_REPLY;
   }
   reply->device_id = raw_reply.data[4] | raw_reply.data[5] << 8;
   return 0;
@@ -168,6 +176,7 @@ int sds011_query_firmware_version(struct sds011_device_t *device)
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
+#ifdef __SIMBA_H__
 void sds011_init_with_uart(struct sds011_device_t *device, struct uart_driver_t *uart)
 {
   device->device_id = SDS011_DEVICE_ID_ANY;
@@ -181,6 +190,7 @@ void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft
   device->chin = &(uart->chin);
   device->chout = &(uart->chout);
 }
+#endif
 
 void sd011_set_query_device_id(struct sds011_device_t *device, sds011_device_id_t device_id)
 {
