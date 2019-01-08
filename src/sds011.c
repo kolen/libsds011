@@ -23,7 +23,7 @@ struct sds011_raw_command_reply_t {
   unsigned char data[6];
 };
 
-#define device_read(device, buffer, size) (device->read_fn(device->tx_device, buffer, size))
+#define device_read(device, buffer, size) (device->read_fn(device->rx_device, buffer, size))
 #define device_write(device, buffer, size) (device->write_fn(device->tx_device, buffer, size))
 
 int sds011_send_command(struct sds011_device_t *device, char command, const char *data, size_t data_length)
@@ -191,6 +191,19 @@ void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft
   device->chout = &(uart->chout);
 }
 #endif
+
+void sds011_init_with_read_write_fns(struct sds011_device_t *device,
+				     sds011_serial_read_fn_t read_fn,
+				     sds011_serial_write_fn_t write_fn,
+				     void *rx_device,
+				     void *tx_device)
+{
+  device->device_id = SDS011_DEVICE_ID_ANY;
+  device->read_fn = read_fn;
+  device->write_fn = write_fn;
+  device->rx_device = rx_device;
+  device->tx_device = tx_device;
+}
 
 void sd011_set_query_device_id(struct sds011_device_t *device, sds011_device_id_t device_id)
 {

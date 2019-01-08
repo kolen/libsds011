@@ -59,6 +59,12 @@ void sds011_init_with_uart(struct sds011_device_t *device, struct uart_driver_t 
 void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft_driver_t *uart);
 #endif
 
+void sds011_init_with_read_write_fns(struct sds011_device_t *device,
+				     sds011_serial_read_fn_t read_fn,
+				     sds011_serial_write_fn_t write_fn,
+				     void *rx_device,
+				     void *tx_device);
+
 void sd011_set_query_device_id(struct sds011_device_t *device, sds011_device_id_t device_id);
 
 int sds011_set_data_reporting_mode(struct sds011_device_t *device, int reporting_mode);
