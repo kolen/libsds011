@@ -5,7 +5,7 @@
   #include "simba.h"
   #define ERROR_BAD_REPLY EPROTO
 #else
-  #define ERROR_BAD_REPLY -1
+  #define ERROR_BAD_REPLY 1
 #endif
 #include "sds011.h"
 
