@@ -51,7 +51,6 @@ int sds011_send_command(struct sds011_device_t *device, char command, const char
   return device_write(device, command_buf, sizeof(command_buf));
 }
 
-// data is 6 bytes
 int sds011_read_raw(struct sds011_device_t *device, struct sds011_raw_command_reply_t *reply)
 {
   unsigned char command_buffer[9];
