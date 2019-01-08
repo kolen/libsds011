@@ -22,16 +22,6 @@ void mock_device_sender_init(struct mock_device_sender *sender)
   sender->write_at = 0;
 }
 
-ssize_t mock_device_write(void *tx_device, const void *buf, size_t size)
-{
-  if (size != 10) {
-    fprintf(stderr, "Only writes of 10 bytes are supported\n");
-    abort();
-  }
-  memcpy(((struct mock_device_receiver*)tx_device)->received, buf, 10);
-  return size;
-}
-
 ssize_t mock_device_read(void *rx_device, void *buf, size_t size)
 {
   struct mock_device_sender *reader = (struct mock_device_sender*)rx_device;
@@ -46,6 +36,28 @@ ssize_t mock_device_read(void *rx_device, void *buf, size_t size)
   return size;
 }
 
+ssize_t mock_device_write(void *tx_device, const void *buf, size_t size)
+{
+  if (size != 10) {
+    fprintf(stderr, "Only writes of 10 bytes are supported\n");
+    abort();
+  }
+  memcpy(((struct mock_device_receiver*)tx_device)->received, buf, 10);
+  return size;
+}
+
+ssize_t mock_device_no_read(void *rx_device, void *buf, size_t size)
+{
+  fprintf(stderr, "Reading is not supported");
+  abort();
+}
+
+ssize_t mock_device_no_write(void *tx_device, const void *buf, size_t size)
+{
+  fprintf(stderr, "Writing is not supported");
+  abort();
+}
+
 void fill_checksum(struct mock_device_sender *sender) {
   int i;
   unsigned char sum = 0;
@@ -56,13 +68,13 @@ void fill_checksum(struct mock_device_sender *sender) {
 void test_parse_measurement(void **state) {
   struct sds011_device_t device;
   struct mock_device_sender sender;
-  struct mock_device_receiver receiver;
+  /* struct mock_device_receiver receiver; */
   mock_device_sender_init(&sender);
   sds011_init_with_read_write_fns(&device,
 				  mock_device_read,
-				  mock_device_write,
+				  mock_device_no_write,
 				  (void*)&sender,
-				  (void*)&receiver);
+				  NULL);
   static const char measurement[10] = {
     0xaa, 0xc0,
     0x34, 0x12, 0x78, 0x56,
@@ -72,7 +84,8 @@ void test_parse_measurement(void **state) {
   memcpy(sender.to_send, measurement, 10);
   fill_checksum(&sender);
   struct sds011_reply_t reply;
-  sds011_read_reply(&device, &reply);
+  int result = sds011_read_reply(&device, &reply);
+  assert_return_code(result, 0);
   assert_int_equal(reply.type, sds011_reply_measurement);
 }
 
