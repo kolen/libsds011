@@ -59,7 +59,7 @@ int sds011_read_raw(struct sds011_device_t *device, struct sds011_raw_command_re
   } while (command_buffer[0] != SDS011_COMMAND_HEAD);
   device_read(device, command_buffer, 9);
 
-  char checksum = 0;
+  unsigned char checksum = 0;
   int i;
   for (i = 1; i < 7; i++) {
     checksum += command_buffer[i];
