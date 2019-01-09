@@ -3,6 +3,7 @@ version: 2
 jobs:
   build:
     docker:
+      # No specific image for C
       - image: circleci/rust:1.31.1
     working_directory: ~/libsds011
     steps:
