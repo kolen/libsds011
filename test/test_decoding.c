@@ -86,6 +86,8 @@ void test_parse_measurement(void **state) {
   int result = sds011_read_reply(&device, &reply);
   assert_return_code(result, 0);
   assert_int_equal(reply.type, sds011_reply_measurement);
+  assert_int_equal(reply.measurement.pm2_5, 0x1234);
+  assert_int_equal(reply.measurement.pm10, 0x5678);
 }
 
 int main(void)
