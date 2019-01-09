@@ -116,11 +116,53 @@ void test_parse_data_reporting_mode(void **state) {
   assert_int_equal(reply.device_id, 0xcafe);
 }
 
+void test_parse_invalid(void **state) {
+  struct sds011_device_t device;
+  struct mock_device_sender sender;
+  mock_device_sender_init(&sender);
+  sds011_init_with_read_write_fns(&device,
+				  mock_device_read,
+				  mock_device_no_write,
+				  (void*)&sender,
+				  NULL);
+  static const unsigned char measurement[10] = {
+    0xaa, 0x12,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xab
+  };
+  memcpy(sender.to_send, measurement, 10);
+  struct sds011_reply_t reply;
+  int result = sds011_read_reply(&device, &reply);
+  assert_true(result < 0);
+}
+
+void test_parse_invalid_c5(void **state) {
+  struct sds011_device_t device;
+  struct mock_device_sender sender;
+  mock_device_sender_init(&sender);
+  sds011_init_with_read_write_fns(&device,
+				  mock_device_read,
+				  mock_device_no_write,
+				  (void*)&sender,
+				  NULL);
+  static const unsigned char measurement[10] = {
+    0xaa, 0xc5, 0x09,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0xab
+  };
+  memcpy(sender.to_send, measurement, 10);
+  struct sds011_reply_t reply;
+  int result = sds011_read_reply(&device, &reply);
+  assert_true(result < 0);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_parse_measurement),
     cmocka_unit_test(test_parse_data_reporting_mode),
+    cmocka_unit_test(test_parse_invalid),
+    cmocka_unit_test(test_parse_invalid_c5),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);
