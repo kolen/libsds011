@@ -1,3 +1,6 @@
+// For ssize_t
+#include <unistd.h>
+
 struct mock_device_receiver {
   unsigned char received[10];
 };
