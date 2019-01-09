@@ -8,6 +8,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install cmake
+          command: apt-get install cmake
+      - run:
           command: mkdir build
       - run:
           command: cmake ..
