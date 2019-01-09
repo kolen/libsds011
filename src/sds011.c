@@ -80,7 +80,6 @@ int sds011_read_reply(struct sds011_device_t *device, struct sds011_reply_t *rep
   struct sds011_raw_command_reply_t raw_reply;
   int read_result = sds011_read_raw(device, &raw_reply);
   if (!read_result) {
-    printf("Read error\n");
     return -ERROR_BAD_REPLY; // TODO: should return proper error
   }
 
