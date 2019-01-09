@@ -1,0 +1,24 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      # No specific image for C
+      - image: circleci/rust:1.31.1
+    working_directory: ~/libsds011
+    steps:
+      - checkout
+      - run:
+          name: install cmake
+          command: sudo apt-get install -y cmake
+      - run:
+          command: mkdir build
+      - run:
+          command: cmake ..
+          working_directory: ~/libsds011/build
+      - run:
+          command: make
+          working_directory: ~/libsds011/build
+      - run:
+          name: run tests
+          command: ctest --output-on-failure
