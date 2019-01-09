@@ -1,5 +1,5 @@
 include_directories ("${PROJECT_SOURCE_DIR}/src")
-add_executable(test_decoding test_decoding.c)
+add_executable(test_decoding test_decoding.c test_support.c)
 add_dependencies(test_decoding test_decoding)
 add_test(test_decoding test_decoding)
 target_link_libraries(test_decoding sds011 cmocka)
