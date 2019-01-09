@@ -26,11 +26,11 @@ struct sds011_raw_command_reply_t {
 #define device_read(device, buffer, size) (device->read_fn(device->rx_device, buffer, size))
 #define device_write(device, buffer, size) (device->write_fn(device->tx_device, buffer, size))
 
-int sds011_send_command(struct sds011_device_t *device, char command, const char *data, size_t data_length)
+int sds011_send_command(struct sds011_device_t *device, unsigned char command, const unsigned char *data, size_t data_length)
 {
-  char command_buf[19];
+  unsigned char command_buf[19];
   int data_i = 0, buf_i = 2;
-  char checksum = 0;
+  unsigned char checksum = 0;
   command_buf[0] = SDS011_COMMAND_HEAD;
   command_buf[1] = command;
   while(data_i < data_length) {
@@ -125,57 +125,57 @@ int sds011_read_reply(struct sds011_device_t *device, struct sds011_reply_t *rep
 
 int sds011_set_data_reporting_mode(struct sds011_device_t *device, int reporting_mode)
 {
-  char data[3] = {2, 1, reporting_mode};
+  unsigned char data[3] = {2, 1, reporting_mode};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_query_data_reporting_mode(struct sds011_device_t *device)
 {
-  static char data[3] = {2, 0};
+  static unsigned char data[3] = {2, 0};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_query_measurement(struct sds011_device_t *device)
 {
-  static char data[1] = {4};
+  static unsigned char data[1] = {4};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_set_device_id(struct sds011_device_t *device, sds011_device_id_t device_id)
 {
-  char data[13] = {5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		   device_id & 0xff,
-		   device_id & 0xff00 >> 8};
+  unsigned char data[13] = {5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			    device_id & 0xff,
+			    device_id & 0xff00 >> 8};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_query_sleep(struct sds011_device_t *device)
 {
-  static char data[1] = {6};
+  static unsigned char data[1] = {6};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_set_sleep(struct sds011_device_t *device, int awake)
 {
-  char data[3] = {6, 1, awake};
+  unsigned char data[3] = {6, 1, awake};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_query_working_period(struct sds011_device_t *device)
 {
-  static char data[2] = {8, 0};
+  static unsigned char data[2] = {8, 0};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_set_working_period(struct sds011_device_t *device, uint8_t sleep_minutes)
 {
-  char data[3] = {8, 1, sleep_minutes};
+  unsigned char data[3] = {8, 1, sleep_minutes};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
 int sds011_query_firmware_version(struct sds011_device_t *device)
 {
-  static char data[1] = {7};
+  static unsigned char data[1] = {7};
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
