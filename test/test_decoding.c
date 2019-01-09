@@ -75,7 +75,7 @@ void test_parse_measurement(void **state) {
 				  mock_device_no_write,
 				  (void*)&sender,
 				  NULL);
-  static const char measurement[10] = {
+  static const unsigned char measurement[10] = {
     0xaa, 0xc0,
     0x34, 0x12, 0x78, 0x56,
     0xfe, 0xca,
