@@ -90,10 +90,37 @@ void test_parse_measurement(void **state) {
   assert_int_equal(reply.measurement.pm10, 0x5678);
 }
 
+void test_parse_data_reporting_mode(void **state) {
+  struct sds011_device_t device;
+  struct mock_device_sender sender;
+  mock_device_sender_init(&sender);
+  sds011_init_with_read_write_fns(&device,
+				  mock_device_read,
+				  mock_device_no_write,
+				  (void*)&sender,
+				  NULL);
+  static const unsigned char measurement[10] = {
+    0xaa, 0xc5, 0x02,
+    0x00, 0x01,
+    0x00,
+    0xfe, 0xca,
+    0x00, 0xab
+  };
+  memcpy(sender.to_send, measurement, 10);
+  fill_checksum(&sender);
+  struct sds011_reply_t reply;
+  int result = sds011_read_reply(&device, &reply);
+  assert_return_code(result, 0);
+  assert_int_equal(reply.type, sds011_reply_data_reporting_mode);
+  assert_int_equal(reply.reporting_mode, SDS011_DATA_REPORTING_QUERY);
+  assert_int_equal(reply.device_id, 0xcafe);
+}
+
 int main(void)
 {
   const struct CMUnitTest tests[] = {
     cmocka_unit_test(test_parse_measurement),
+    cmocka_unit_test(test_parse_data_reporting_mode),
   };
 
   return cmocka_run_group_tests(tests, NULL, NULL);
