@@ -68,7 +68,6 @@ void fill_checksum(struct mock_device_sender *sender) {
 void test_parse_measurement(void **state) {
   struct sds011_device_t device;
   struct mock_device_sender sender;
-  /* struct mock_device_receiver receiver; */
   mock_device_sender_init(&sender);
   sds011_init_with_read_write_fns(&device,
 				  mock_device_read,
