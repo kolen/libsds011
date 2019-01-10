@@ -45,7 +45,7 @@ int sds011_send_command(struct sds011_device_t *device, unsigned char command, c
     buf_i++;
   }
   command_buf[15] = device->device_id & 0xff;
-  command_buf[16] = device->device_id & 0xff00 >> 8;
+  command_buf[16] = (device->device_id & 0xff00) >> 8;
   command_buf[17] = checksum;
   command_buf[18] = SDS011_COMMAND_TAIL;
   return device_write(device, command_buf, sizeof(command_buf));
