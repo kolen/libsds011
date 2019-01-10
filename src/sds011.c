@@ -26,7 +26,10 @@ struct sds011_raw_command_reply_t {
 #define device_read(device, buffer, size) (device->read_fn(device->rx_device, buffer, size))
 #define device_write(device, buffer, size) (device->write_fn(device->tx_device, buffer, size))
 
-int sds011_send_command(struct sds011_device_t *device, unsigned char command, const unsigned char *data, size_t data_length)
+int sds011_send_command(struct sds011_device_t *device,
+			unsigned char command,
+			const unsigned char *data,
+			size_t data_length)
 {
   unsigned char command_buf[19];
   int data_i = 0, buf_i = 2;
