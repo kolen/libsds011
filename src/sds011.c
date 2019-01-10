@@ -182,19 +182,44 @@ int sds011_query_firmware_version(struct sds011_device_t *device)
   return sds011_send_command(device, SDS011_COMMAND_OUTGOING, data, sizeof(data));
 }
 
-#ifdef __SIMBA_H__
+#ifdef SDS011_SIMBA
+
+ssize_t sds011_uart_read(void *rx_device, void *buf, size_t size)
+{
+  return uart_read((struct uart_driver_t *)rx_device, buf, size);
+}
+
+ssize_t sds011_uart_write(void *tx_device, const void *buf, size_t size)
+{
+  return uart_write((struct uart_driver_t *)tx_device, buf, size);
+}
+
+ssize_t sds011_uart_soft_read(void *rx_device, void *buf, size_t size)
+{
+  return uart_soft_read((struct uart_soft_driver_t *)rx_device, buf, size);
+}
+
+ssize_t sds011_uart_soft_write(void *tx_device, const void *buf, size_t size)
+{
+  return uart_soft_write((struct uart_soft_driver_t *)tx_device, buf, size);
+}
+
 void sds011_init_with_uart(struct sds011_device_t *device, struct uart_driver_t *uart)
 {
   device->device_id = SDS011_DEVICE_ID_ANY;
-  device->chin = &(uart->chin);
-  device->chout = &(uart->chout);
+  device->read_fn = sds011_uart_read;
+  device->write_fn = sds011_uart_write;
+  device->tx_device = uart;
+  device->rx_device = uart;
 }
 
 void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft_driver_t *uart)
 {
   device->device_id = SDS011_DEVICE_ID_ANY;
-  device->chin = &(uart->chin);
-  device->chout = &(uart->chout);
+  device->read_fn = sds011_uart_soft_read;
+  device->write_fn = sds011_uart_soft_write;
+  device->tx_device = uart;
+  device->rx_device = uart;
 }
 #endif
 

@@ -1,4 +1,6 @@
-#ifndef __SIMBA_H__
+#ifdef SDS011_SIMBA
+  #include "simba.h"
+#else
   #include <stdint.h>
   #include <stddef.h>
   // POSIX only
@@ -54,7 +56,7 @@ struct sds011_reply_t {
   sds011_device_id_t device_id;
 };
 
-#ifdef __SIMBA_H__
+#ifdef SDS011_SIMBA
 void sds011_init_with_uart(struct sds011_device_t *device, struct uart_driver_t *uart);
 void sds011_init_with_uart_soft(struct sds011_device_t *device, struct uart_soft_driver_t *uart);
 #endif
