@@ -2,7 +2,7 @@
 #include <unistd.h>
 
 struct mock_device_receiver {
-  unsigned char received[10];
+  unsigned char received[19];
 };
 
 struct mock_device_sender {

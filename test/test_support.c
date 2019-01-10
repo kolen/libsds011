@@ -25,11 +25,11 @@ ssize_t mock_device_read(void *rx_device, void *buf, size_t size)
 
 ssize_t mock_device_write(void *tx_device, const void *buf, size_t size)
 {
-  if (size != 10) {
-    fprintf(stderr, "Only writes of 10 bytes are supported\n");
+  if (size != 19) {
+    fprintf(stderr, "Only writes of 19 bytes are supported\n");
     abort();
   }
-  memcpy(((struct mock_device_receiver*)tx_device)->received, buf, 10);
+  memcpy(((struct mock_device_receiver*)tx_device)->received, buf, 19);
   return size;
 }
 
