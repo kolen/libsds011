@@ -1,3 +1,5 @@
+#ifndef __SDS011_H__
+#define __SDS011_H__
 #ifdef SDS011_SIMBA
   #include "simba.h"
 #else
@@ -80,3 +82,5 @@ int sds011_set_working_period(struct sds011_device_t *device, uint8_t sleep_minu
 int sds011_query_firmware_version(struct sds011_device_t *device);
 
 int sds011_read_reply(struct sds011_device_t *device, struct sds011_reply_t *reply);
+
+#endif
